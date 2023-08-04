@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+
+
+
+<!--    <bean class="org.zerock.springex.sample.SampleDAO"></bean>-->
+<!--    <bean class="org.zerock.springex.sample.SampleService"></bean>-->
+
+    <!-- ApplicationContext가 생성된 객체들을 관리   스테레오 타입 : @Controller @Service @Repository @Component )-->
+    <!--<context:component-scan base-package="org.zerock.springex.sample"></context:component-scan>-->
+
+    <context:component-scan base-package="org.zerock.springex"></context:component-scan>
+
+    <!-- 매퍼 인터페이스 설정 추가   -->
+    <mybatis:scan base-package="org.zerock.springex.mapper"></mybatis:scan>
+
+
+
+
+
+    <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+        <property name="driverClassName" value="org.mariadb.jdbc.Driver"></property>
+        <property name="jdbcUrl" value="jdbc:mariadb://localhost:3307/webdb"></property>
+        <property name="username" value="webuser"></property>
+        <property name="password" value="webuser"></property>
+        <property name="dataSourceProperties">
+            <props>
+                <prop key="cachePrepStmts">true</prop>
+                <prop key="prepStmtCacheSize">250</prop>
+                <prop key="prepStmtCacheSqlLimit">2048</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource"
+          destroy-method="close">
+        <constructor-arg ref="hikariConfig" />
+    </bean>
+
+    <!-- xml 매퍼 위치 classpath: 접두어를 이용해서 인식되는 경로  mappers 폴더 밑에 폴더가 있어도 됨 **   -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mapperLocations" value="classpath:/mappers/**/*.xml"></property>
+    </bean>
+
+</beans>

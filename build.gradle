@@ -1,0 +1,109 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group 'org.zerock'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    junitVersion = '5.9.2'
+}
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+dependencies {
+    compileOnly('javax.servlet:javax.servlet-api:4.0.1')
+
+    /* 마리아 DB 드라이브 */
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '3.0.4'
+
+    /* 커넥션풀 : 미리 데이터베이스와 연결시킨 상태를 유지하는 기술 */
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: '3.3.1'
+
+   //Spring JDBC는 JDBC를 사용하는 코드와 데이터베이스 공급업체 특정 오류 코드의 구문 분석을 단순화하는 추상화 계층을 제공합니다.
+    implementation group: 'org.springframework', name: 'spring-jdbc', version: '5.3.27'
+
+    //특수 인터페이스 또는 POJO를 구현하는 클래스에 대한 프로그래밍 및 선언적 트랜잭션 관리를 지원합니다.
+    implementation group: 'org.springframework', name: 'spring-tx', version: '5.3.27'
+
+
+    //MyBatis SQL 매퍼 프레임워크는 관계형 데이터베이스를 객체 지향 애플리케이션과 함께 사용하기 쉽게 해줍니다.
+    // MyBatis는 XML 설명자 또는 주석을 사용하여 저장 프로시저 또는 SQL 문과 개체를 연결합니다. 단순성은 개체 관계형 매핑 도구에 비해 MyBatis 데이터 매퍼의 가장 큰 장점입니다.
+    implementation 'org.mybatis:mybatis:3.5.9'
+
+    // MyBatis SQL 매핑 프레임워크를 위한 사용하기 쉬운 Spring 브리지.
+    implementation 'org.mybatis:mybatis-spring:2.0.7'
+
+
+
+    // Ioc,DI를 위한 스프링 핵심
+    implementation group: 'org.springframework', name: 'spring-core', version: '5.3.27'
+
+    //Spring Context는 컨텍스트와 같은 구성된 객체에 대한 액세스를 제공합니다.
+    // Spring Beans의 기능을 상속하고 국제화, 이벤트 전파, 리소스 로딩 및 투명한 컨텍스트 생성에 대한 지원을 추가합니다
+    implementation group: 'org.springframework', name: 'spring-context', version: '5.3.27'
+
+    //Spring Test는 JUnit 또는 TestNG를 사용하여 Spring 구성 요소의 단위 테스트 및 통합 테스트를 지원합니다.
+    // Spring ApplicationContexts의 일관된 로딩 및 캐싱을 제공하고 코드를 격리하여 테스트하는 데 사용할 수 있는 목 객체를 제공합니다.
+    testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.27'
+
+    //Spring webmvc에는 웹 애플리케이션을 위한 Spring의 MVC(모델-뷰-컨트롤러) 및 REST 웹 서비스 구현이 포함되어 있습니다.
+    // 도메인 모델 코드와 웹 양식을 명확하게 분리하고 Spring Framework의 다른 모든 기능과 통합합니다.
+    implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.3.27'
+
+
+
+
+
+    /* log4j 관련 라이브러리 */
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.2'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.2'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.2'
+
+
+
+    //롬복
+    compileOnly  'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    /* 테스트 환경에서 @Log4j2 기능을 활용하기 위해서는 테스트 환경에서도 어노테이션을 처리하는 testAnnotationProcessor와
+    *  testCompileOnly 설정을 추가해 주어야 함 */
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+
+
+    /* java server page tag library  jsp에서 for문과 if 문 사용 가능  */
+    implementation group: 'jstl', name: 'jstl', version: '1.2'
+
+
+    /* 번거로운 작업인 DTO -> VO,   VO -> DTO 변환은 ModelMapper 라이브러리 이용 */
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.0.0'
+
+
+
+
+    /*  DTO의 검증을 위한 Validate 관련 라이브러리
+    *   과거의 웹 개발은 자바스크립트를 이용해서 브라우저에서만 유효성 검사를 진행하는 방식이 많았지만, 모바일과 같이 다양한 환경에서 서버를 이용하는 현재에는
+    *   브라우저를 사용하는 프론트 쪽에서의 검증과 더불어 서버에서도 입력되는 값들을 검증하는 것이 일반적인다.
+    *  이러한 검증작업은 컨트롤러에서 진행되는데 스프링 MVC의 경우 @Valid와 BindingResult라는 존재를 이용해서 간단하게 처리할 수가 있다. 버전 6(7은 문제 소지 있음)
+    * */
+    implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.2.1.Final'
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+}
+
+test {
+    useJUnitPlatform()
+}
